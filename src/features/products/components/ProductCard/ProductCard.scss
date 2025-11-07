@@ -1,0 +1,137 @@
+.product-card {
+  display: grid;
+  grid-template-columns: 60px 1fr 1fr 1fr 120px 120px;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f9fafb;
+  }
+
+  &__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-initial {
+      color: white;
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
+
+  &__name {
+    font-weight: 500;
+    color: #1f2937;
+  }
+
+  &__category {
+    .category-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+  }
+
+  &__price {
+    font-weight: 500;
+    color: #1f2937;
+  }
+
+  &__stock {
+    color: #6b7280;
+    text-align: center;
+  }
+
+  &__status {
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+
+      &::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+
+      &--active {
+        background-color: #d1fae5;
+        color: #065f46;
+
+        &::before {
+          background-color: #10b981;
+        }
+      }
+
+      &--inactive {
+        background-color: #fee2e2;
+        color: #991b1b;
+
+        &::before {
+          background-color: #ef4444;
+        }
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      color: #6b7280;
+
+      &:hover {
+        background-color: #f3f4f6;
+      }
+
+      &--view:hover {
+        color: #3b82f6;
+      }
+
+      &--edit:hover {
+        color: #f59e0b;
+      }
+
+      &--delete:hover {
+        color: #ef4444;
+        background-color: #fee2e2;
+      }
+    }
+  }
+}
