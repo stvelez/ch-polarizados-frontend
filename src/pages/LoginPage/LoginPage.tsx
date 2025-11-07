@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../../components";
 import { Button } from "../../components";
-import { authUtils } from "../../utils/auth";
 import "./LoginPage.scss";
+import { authService } from "../../services";
 
 export const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -15,23 +15,16 @@ export const LoginPage = () => {
     e.preventDefault();
     setError("");
 
-    if (!email || !password) {
-      setError("Por favor completa todos los campos");
-      return;
-    }
+    authService
+      .login({ email, password })
+      .then(() => {
+        navigate("/products");
+      })
+      .catch((err: Error) => {
+        setError(err.message);
+      });
 
-    if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres");
-      return;
-    }
-
-    const success = authUtils.login(email, password);
-
-    if (success) {
-      navigate("/products");
-    } else {
-      setError("Credenciales inválidas");
-    }
+    // if (!email || !password) {
   };
 
   return (
@@ -43,10 +36,17 @@ export const LoginPage = () => {
             Ingresa tus credenciales para acceder
           </p>
           <div className="login-info">
-            <p>El login está simulado. Usa cualquier email y contraseña de más de 6 caracteres:</p>
+            <p>
+              El login está simulado. Usa cualquier email y contraseña de más de
+              6 caracteres:
+            </p>
             <ul>
-              <li><strong>Email:</strong> admin@chpolarizados.com</li>
-              <li><strong>Password:</strong> 123456</li>
+              <li>
+                <strong>Email:</strong> test@correo.com
+              </li>
+              <li>
+                <strong>Password:</strong> 123456
+              </li>
             </ul>
           </div>
 
