@@ -1,5 +1,4 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { authUtils } from '../../utils/auth';
 import './Sidebar.scss';
 
 interface SidebarProps {
@@ -11,7 +10,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    authUtils.logout();
     navigate('/login');
     if (onClose) onClose();
   };
