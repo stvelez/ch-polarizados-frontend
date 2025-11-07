@@ -34,28 +34,6 @@ src/
 └── utils/          # Utilidades (axios, auth)
 ```
 
-### 📝 Convención de Nomenclatura
-
-**IMPORTANTE:** Las páginas principales deben estar en `src/pages/` con el sufijo `Page`:
-- ✅ `pages/ProductsPage/ProductsPage.tsx` - Correcto
-- ❌ `features/products/ProductList.tsx` - Incorrecto para páginas completas
-
-**Diferencia entre `pages/` y `features/`:**
-- **`pages/`**: Páginas completas que representan rutas (ProductsPage, Dashboard, LoginPage)
-- **`features/`**: Componentes específicos de negocio reutilizables (ProductCard, API, tipos)
-
-## 🎯 Features
-
-- ✅ Sistema de autenticación con rutas protegidas
-- ✅ Sidebar con navegación completa
-- ✅ Layout responsivo (Desktop + Móvil)
-- ✅ Gestión de productos (lista, búsqueda, filtros)
-- ✅ Dashboard con estadísticas
-- ✅ Componentes reutilizables con variantes
-- ✅ Diseño responsive y moderno
-- ✅ Integración con Axios (interceptores configurados)
-- ✅ Mock data para desarrollo
-
 ## 📚 Documentación
 
 - **[GUIA_DE_USO.md](./GUIA_DE_USO.md)** - Guía completa de uso
