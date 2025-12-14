@@ -1,4 +1,4 @@
-.product-list {
+.sales-list {
   padding: 40px;
   background-color: transparent;
 
@@ -70,10 +70,10 @@
         max-width: 400px;
       }
 
-      .category-filter {
+      .status-filter {
         min-width: 220px;
 
-        .category-select {
+        .status-select {
           width: 100%;
           padding: 10px 14px;
           border: 1px solid #d1d5db;
@@ -134,7 +134,7 @@
 }
 
 @media (max-width: 1024px) {
-  .product-list {
+  .sales-list {
     padding: 20px;
 
     &__header {
@@ -152,7 +152,7 @@
           max-width: 100%;
         }
 
-        .category-filter {
+        .status-filter {
           min-width: 100%;
         }
       }

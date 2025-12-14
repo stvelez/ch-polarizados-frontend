@@ -9,12 +9,31 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
   const navigate = useNavigate();
 
+  // Obtener el rol del usuario
+  const getUserRole = (): string => {
+    const userDataStr = localStorage.getItem('userData');
+    if (!userDataStr) return 'user';
+    try {
+      const userData = JSON.parse(userDataStr);
+      return userData.role || 'user';
+    } catch {
+      return 'user';
+    }
+  };
+
+  const userRole = getUserRole();
+
   const handleLogout = () => {
     navigate('/login');
     if (onClose) onClose();
   };
 
-  const menuItems = [
+  const menuItems: Array<{
+    path: string;
+    label: string;
+    icon: JSX.Element;
+    adminOnly?: boolean;
+  }> = [
     {
       path: '/dashboard',
       label: 'Dashboard',
@@ -82,6 +101,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
         </svg>
       ),
     },
+    {
+      path: '/users',
+      label: 'Usuarios',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="8.5" cy="7" r="4" />
+          <line x1="20" y1="8" x2="20" y2="14" />
+          <line x1="23" y1="11" x2="17" y2="11" />
+        </svg>
+      ),
+      adminOnly: true,
+    },
   ];
 
   return (
@@ -105,20 +137,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
         {/* Navigation */}
         <nav className="sidebar__nav">
           <ul className="nav-list">
-            {menuItems.map((item) => (
-              <li key={item.path} className="nav-item">
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `nav-link ${isActive ? 'nav-link--active' : ''}`
-                  }
-                  onClick={onClose}
-                >
-                  <span className="nav-icon">{item.icon}</span>
-                  <span className="nav-label">{item.label}</span>
-                </NavLink>
-              </li>
-            ))}
+            {menuItems
+              .filter((item) => !item.adminOnly || userRole === 'admin')
+              .map((item) => (
+                <li key={item.path} className="nav-item">
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `nav-link ${isActive ? 'nav-link--active' : ''}`
+                    }
+                    onClick={onClose}
+                  >
+                    <span className="nav-icon">{item.icon}</span>
+                    <span className="nav-label">{item.label}</span>
+                  </NavLink>
+                </li>
+              ))}
           </ul>
         </nav>
 

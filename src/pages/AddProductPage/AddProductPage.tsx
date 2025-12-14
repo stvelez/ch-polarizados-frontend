@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Button, Input } from "../../components";
-import type { Product } from "../../features/products/types/product.types";
 import "./AddProductPage.scss";
 import { productsService } from "../../services";
 
@@ -9,14 +9,16 @@ export const AddProductPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
-    category: "",
+    description: "",
     price: "",
+    stock: "0",
+    sku: "",
   });
 
   const [errors, setErrors] = useState({
     name: "",
-    category: "",
     price: "",
+    stock: "",
   });
 
   const handleChange = (
@@ -38,8 +40,8 @@ export const AddProductPage = () => {
   const validateForm = () => {
     const newErrors = {
       name: "",
-      category: "",
       price: "",
+      stock: "",
     };
 
     let isValid = true;
@@ -49,16 +51,16 @@ export const AddProductPage = () => {
       isValid = false;
     }
 
-    if (!formData.category) {
-      newErrors.category = "La categoría es requerida";
-      isValid = false;
-    }
-
     if (!formData.price) {
       newErrors.price = "El precio es requerido";
       isValid = false;
     } else if (isNaN(Number(formData.price)) || Number(formData.price) <= 0) {
       newErrors.price = "El precio debe ser un número mayor a 0";
+      isValid = false;
+    }
+
+    if (formData.stock && (isNaN(Number(formData.stock)) || Number(formData.stock) < 0)) {
+      newErrors.stock = "El stock debe ser un número mayor o igual a 0";
       isValid = false;
     }
 
@@ -73,15 +75,23 @@ export const AddProductPage = () => {
       return;
     }
 
-    const newProduct: Omit<Product, "id"> = {
-      name: formData.name,
-      category: formData?.category,
-      price: Number(formData.price),
-      status: "active",
-    };
+    try {
+      const newProduct = {
+        name: formData.name,
+        description: formData.description || "",
+        price: Number(formData.price),
+        stock: Number(formData.stock) || 0,
+        sku: formData.sku || null,
+        isActive: true,
+      };
 
-    await productsService.create(newProduct);
-    navigate("/products");
+      await productsService.create(newProduct);
+      toast.success('Producto creado exitosamente');
+      navigate("/products");
+    } catch (error: any) {
+      console.error('Error al crear producto:', error.response?.data?.message);
+      toast.error(error.response?.data?.message || 'Error al crear el producto');
+    }
   };
 
   const handleCancel = () => {
@@ -133,26 +143,13 @@ export const AddProductPage = () => {
               </div>
 
               <div className="form-field">
-                <label className="field-label">
-                  Categoría <span className="required">*</span>
-                </label>
-                <select
-                  name="category"
-                  value={formData.category}
+                <Input
+                  label="Descripción"
+                  name="description"
+                  placeholder="Descripción del producto (opcional)"
+                  value={formData.description}
                   onChange={handleChange}
-                  className={`field-select ${
-                    errors.category ? "field-select--error" : ""
-                  }`}
-                  required
-                >
-                  <option value="">Selecciona una categoría</option>
-                  <option value="Cuidado automotriz">Cuidado automotriz</option>
-                  <option value="Lujo">Lujo</option>
-                  <option value="Servicio">Servicio</option>
-                </select>
-                {errors.category && (
-                  <span className="field-error">{errors.category}</span>
-                )}
+                />
               </div>
 
               <div className="form-field">
@@ -179,6 +176,28 @@ export const AddProductPage = () => {
                     </svg>
                   }
                   required
+                />
+              </div>
+
+              <div className="form-field">
+                <Input
+                  label="Stock"
+                  name="stock"
+                  type="number"
+                  placeholder="0"
+                  value={formData.stock}
+                  onChange={handleChange}
+                  error={errors.stock}
+                />
+              </div>
+
+              <div className="form-field">
+                <Input
+                  label="SKU (opcional)"
+                  name="sku"
+                  placeholder="Ej: PROD-001"
+                  value={formData.sku}
+                  onChange={handleChange}
                 />
               </div>
             </div>

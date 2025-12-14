@@ -1,0 +1,134 @@
+.users-list {
+  padding: 40px;
+  background-color: transparent;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+
+    .header-content {
+      .header-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 4px;
+      }
+
+      .header-subtitle {
+        font-size: 15px;
+        color: #6b7280;
+      }
+    }
+  }
+
+  &__filters {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .search-container {
+      max-width: 500px;
+    }
+  }
+
+  &__content {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .loading-state,
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 16px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background-color: #f9fafb;
+        border-bottom: 2px solid #e5e7eb;
+
+        th {
+          padding: 16px 20px;
+          text-align: left;
+          font-size: 12px;
+          font-weight: 600;
+          color: #6b7280;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+      }
+
+      tbody {
+        min-height: 200px;
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .users-list {
+    padding: 20px;
+
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    &__filters {
+      .search-container {
+        max-width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .users-list {
+    padding: 16px;
+
+    &__header {
+      .header-content {
+        .header-title {
+          font-size: 24px;
+        }
+
+        .header-subtitle {
+          font-size: 14px;
+        }
+      }
+    }
+
+    &__filters {
+      padding: 16px;
+    }
+
+    &__content {
+      .users-table {
+        font-size: 14px;
+
+        thead th {
+          padding: 12px 16px;
+        }
+
+        tbody td {
+          padding: 12px 16px;
+        }
+      }
+    }
+  }
+}

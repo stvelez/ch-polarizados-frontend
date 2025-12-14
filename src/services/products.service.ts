@@ -3,32 +3,54 @@ import type { Product, ProductsResponse } from '../features/products/types/produ
 
 const PRODUCTS_ENDPOINT = '/products';
 
+// DTOs actualizados según schema de Prisma
 export interface CreateProductDto {
-    id?: number;
   name: string;
-  category: string;
+  description?: string | null;
   price: number;
-  status?: 'active' | 'inactive';
-  avatar?: string;
+  stock?: number;
+  sku?: string | null;
+  isActive?: boolean;
 }
 
 export interface UpdateProductDto {
   name?: string;
-  category?: string;
+  description?: string | null;
   price?: number;
-  status?: 'active' | 'inactive';
-  avatar?: string;
+  stock?: number;
+  sku?: string | null;
+  isActive?: boolean;
 }
 
 export const productsService = {
   getAll: async (): Promise<Product[]> => {
-    const response = await api.get<Product[]>(PRODUCTS_ENDPOINT);
-    return response.data;
+    const response = await api.get<any>(`${PRODUCTS_ENDPOINT}`);
+    
+    // Manejar diferentes formatos de respuesta
+    let productsArray: Product[] = [];
+    
+    if (Array.isArray(response.data)) {
+      productsArray = response.data;
+    } else if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+      productsArray = Array.isArray(response.data.data) ? response.data.data : [];
+    } else if (response.data && typeof response.data === 'object' && 'products' in response.data) {
+      productsArray = Array.isArray(response.data.products) ? response.data.products : [];
+    }
+    
+    // Normalizar precios (convertir string a number)
+    return productsArray.map(p => ({
+      ...p,
+      price: typeof p.price === 'string' ? parseFloat(p.price) : p.price,
+    }));
   },
 
-  getById: async (id: number): Promise<Product> => {
-    const response = await api.get<Product>(`${PRODUCTS_ENDPOINT}/${id}`);
-    return response.data;
+  getById: async (id: string): Promise<Product> => {
+    const response = await api.get<any>(`${PRODUCTS_ENDPOINT}/${id}`);
+    const product = Array.isArray(response.data) ? response.data[0] : response.data;
+    return {
+      ...product,
+      price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+    };
   },
 
   create: async (productData: CreateProductDto): Promise<Product> => {
@@ -36,17 +58,17 @@ export const productsService = {
     return response.data;
   },
 
-  update: async (id: number, productData: UpdateProductDto): Promise<Product> => {
+  update: async (id: string, productData: UpdateProductDto): Promise<Product> => {
     const response = await api.put<Product>(`${PRODUCTS_ENDPOINT}/${id}`, productData);
     return response.data;
   },
 
-  patch: async (id: number, productData: Partial<UpdateProductDto>): Promise<Product> => {
+  patch: async (id: string, productData: Partial<UpdateProductDto>): Promise<Product> => {
     const response = await api.patch<Product>(`${PRODUCTS_ENDPOINT}/${id}`, productData);
     return response.data;
   },
 
-  delete: async (id: number): Promise<{ message: string; success: boolean }> => {
+  delete: async (id: string): Promise<{ message: string; success: boolean }> => {
     const response = await api.delete<{ message: string; success: boolean }>(`${PRODUCTS_ENDPOINT}/${id}`);
     return response.data;
   },
@@ -63,8 +85,8 @@ export const productsService = {
     return response.data;
   },
 
-  updateStatus: async (id: number, status: 'active' | 'inactive'): Promise<Product> => {
-    const response = await api.patch<Product>(`${PRODUCTS_ENDPOINT}/${id}/status`, { status });
+  updateStatus: async (id: string, isActive: boolean): Promise<Product> => {
+    const response = await api.patch<Product>(`${PRODUCTS_ENDPOINT}/${id}/status`, { isActive });
     return response.data;
   },
 };

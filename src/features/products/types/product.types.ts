@@ -1,11 +1,14 @@
+// Tipos basados en el schema de Prisma
 export interface Product {
-  id: number;
+  id: string; // UUID
   name: string;
-  category: string;
-  price: number;
-  createdAt?: string;
-  status?: 'active' | 'inactive';
-  avatar?: string;
+  description: string | null;
+  price: number; // Decimal en la BD
+  stock: number;
+  sku: string | null;
+  isActive: boolean;
+  createdAt: string; // DateTime
+  updatedAt: string; // DateTime
 }
 
 export interface ProductsResponse {

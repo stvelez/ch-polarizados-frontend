@@ -6,8 +6,8 @@ import "./LoginPage.scss";
 import { authService } from "../../services";
 
 export const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("admin@chpolarizados.com");
+  const [password, setPassword] = useState("123456");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -17,11 +17,13 @@ export const LoginPage = () => {
 
     authService
       .login({ email, password })
-      .then(() => {
+      .then((response) => {
+        console.log("Login exitoso", response);
         navigate("/products");
       })
       .catch((err: Error) => {
-        setError(err.message);
+        console.error("Error en login:", err);
+        setError(err.message || "Error al iniciar sesión. Verifica tus credenciales.");
       });
 
     // if (!email || !password) {
@@ -56,7 +58,7 @@ export const LoginPage = () => {
             <Input
               label="Correo Electrónico"
               type="email"
-              placeholder="ejemplo@correo.com"
+              placeholder="admin@chpolarizados.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

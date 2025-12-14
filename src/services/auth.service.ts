@@ -5,31 +5,51 @@ export interface LoginCredentials {
   password: string;
 }
 
+// Tipos basados en el modelo User de Prisma
+export interface User {
+  id: string; // UUID
+  email: string;
+  name: string;
+  role: string; // admin, user, etc.
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name?: string;
+  data: {
+    token: string;
+    user: {
+      id: string;
+      email: string;
+      name: string;
+      role: string;
+      isActive: boolean;
+    };
   };
 }
 
 export interface AuthUser {
+  id: string;
   email: string;
+  name: string;
   token: string;
-  name?: string;
+  role: string;
+  isActive: boolean;
 }
-
 
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
       const response = await api.post<LoginResponse>(
-        "/users/login",
+        "/auth/login",
         credentials
       );
 
-      localStorage.setItem("authToken", response.data.token);
+      console.log("Respuesta de login:", response.data.data);
+      // Guardar token y datos del usuario
+      localStorage.setItem("authToken", response.data.data.token);
+      localStorage.setItem("userData", JSON.stringify(response.data.data.user));
 
       return response.data;
     } catch (error: unknown) {
@@ -40,23 +60,25 @@ export const authService = {
 
   logout: (): void => {
     localStorage.removeItem("authToken");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userName");
+    localStorage.removeItem("userData");
   },
 
   getCurrentUser: (): AuthUser | null => {
     const token = localStorage.getItem("authToken");
-    const email = localStorage.getItem("userEmail");
-    const name = localStorage.getItem("userName");
+    const userDataStr = localStorage.getItem("userData");
 
-    if (!token || !email) {
+    if (!token || !userDataStr) {
       return null;
     }
 
-    return {
-      email,
-      token,
-      name: name || undefined,
-    };
+    try {
+      const userData = JSON.parse(userDataStr);
+      return {
+        ...userData,
+        token,
+      };
+    } catch {
+      return null;
+    }
   },
 };

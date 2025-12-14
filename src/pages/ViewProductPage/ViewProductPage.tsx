@@ -20,7 +20,7 @@ export const ViewProductPage = () => {
 
       try {
         setLoading(true);
-        const productData = await productsService.getById(Number(id));
+        const productData = await productsService.getById(id);
         setProduct(productData);
       } catch (error) {
         console.error("Error al cargar el producto:", error);
@@ -115,22 +115,18 @@ export const ViewProductPage = () => {
         <div className="product-detail">
           <div className="detail-header">
             <div className="product-avatar">
-              {product.avatar ? (
-                <img src={product.avatar} alt={product.name} />
-              ) : (
-                <span className="avatar-initial">
-                  {product.name.charAt(0).toUpperCase()}
-                </span>
-              )}
+              <span className="avatar-initial">
+                {product.name.charAt(0).toUpperCase()}
+              </span>
             </div>
             <div className="product-main-info">
               <h2 className="product-name">{product.name}</h2>
               <span
                 className={`status-badge status-badge--${
-                  product.status || "active"
+                  product.isActive ? "active" : "inactive"
                 }`}
               >
-                {product.status === "inactive" ? "Inactivo" : "Activo"}
+                {product.isActive ? "Activo" : "Inactivo"}
               </span>
             </div>
           </div>
@@ -149,10 +145,15 @@ export const ViewProductPage = () => {
               </div>
 
               <div className="info-item">
-                <label className="info-label">Categoría</label>
+                <label className="info-label">Descripción</label>
+                <p className="info-value">{product.description || "Sin descripción"}</p>
+              </div>
+
+              <div className="info-item">
+                <label className="info-label">SKU</label>
                 <p className="info-value">
                   <span className="category-badge">
-                    {product.category || "Sin categoría"}
+                    {product.sku || "Sin SKU"}
                   </span>
                 </p>
               </div>
@@ -163,14 +164,19 @@ export const ViewProductPage = () => {
               </div>
 
               <div className="info-item">
+                <label className="info-label">Stock</label>
+                <p className="info-value">{product.stock} unidades</p>
+              </div>
+
+              <div className="info-item">
                 <label className="info-label">Estado</label>
                 <p className="info-value">
                   <span
                     className={`status-badge status-badge--${
-                      product.status || "active"
+                      product.isActive ? "active" : "inactive"
                     }`}
                   >
-                    {product.status === "inactive" ? "Inactivo" : "Activo"}
+                    {product.isActive ? "Activo" : "Inactivo"}
                   </span>
                 </p>
               </div>
@@ -178,6 +184,11 @@ export const ViewProductPage = () => {
               <div className="info-item">
                 <label className="info-label">Fecha de Creación</label>
                 <p className="info-value">{formatDate(product.createdAt)}</p>
+              </div>
+
+              <div className="info-item">
+                <label className="info-label">Última Actualización</label>
+                <p className="info-value">{formatDate(product.updatedAt)}</p>
               </div>
             </div>
           </div>

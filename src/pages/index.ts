@@ -4,3 +4,8 @@ export { ProductsPage } from './ProductsPage/ProductsPage';
 export { AddProductPage } from './AddProductPage/AddProductPage';
 export { EditProductPage } from './EditProductPage/EditProductPage';
 export { ViewProductPage } from './ViewProductPage/ViewProductPage';
+export { NewSalePage } from './NewSalePage/NewSalePage';
+export { SalesPage } from './SalesPage/SalesPage';
+export { UsersPage } from './UsersPage/UsersPage';
+export { AddUserPage } from './AddUserPage/AddUserPage';
+export { EditUserPage } from './EditUserPage/EditUserPage';

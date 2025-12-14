@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Button, Input } from "../../components";
-import type { Product } from "../../features/products/types/product.types";
 import "./EditProductPage.scss";
 import { productsService } from "../../services";
 
@@ -11,15 +11,17 @@ export const EditProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
-    category: "",
+    description: "",
     price: "",
-    status: "active" as "active" | "inactive",
+    stock: "0",
+    sku: "",
+    isActive: true,
   });
 
   const [errors, setErrors] = useState({
     name: "",
-    category: "",
     price: "",
+    stock: "",
   });
 
   useEffect(() => {
@@ -31,12 +33,14 @@ export const EditProductPage = () => {
 
       try {
         setLoading(true);
-        const product = await productsService.getById(Number(id));
+        const product = await productsService.getById(id);
         setFormData({
           name: product.name,
-          category: product.category,
+          description: product.description || "",
           price: product.price.toString(),
-          status: product.status || "active",
+          stock: product.stock.toString(),
+          sku: product.sku || "",
+          isActive: product.isActive,
         });
       } catch (error) {
         console.error("Error al cargar el producto:", error);
@@ -69,8 +73,8 @@ export const EditProductPage = () => {
   const validateForm = () => {
     const newErrors = {
       name: "",
-      category: "",
       price: "",
+      stock: "",
     };
 
     let isValid = true;
@@ -80,16 +84,16 @@ export const EditProductPage = () => {
       isValid = false;
     }
 
-    if (!formData.category) {
-      newErrors.category = "La categoría es requerida";
-      isValid = false;
-    }
-
     if (!formData.price) {
       newErrors.price = "El precio es requerido";
       isValid = false;
     } else if (isNaN(Number(formData.price)) || Number(formData.price) <= 0) {
       newErrors.price = "El precio debe ser un número mayor a 0";
+      isValid = false;
+    }
+
+    if (formData.stock && (isNaN(Number(formData.stock)) || Number(formData.stock) < 0)) {
+      newErrors.stock = "El stock debe ser un número mayor o igual a 0";
       isValid = false;
     }
 
@@ -105,17 +109,21 @@ export const EditProductPage = () => {
     }
 
     try {
-      const updatedProduct: Partial<Product> = {
+      const updatedProduct = {
         name: formData.name,
-        category: formData.category,
+        description: formData.description || null,
         price: Number(formData.price),
-        status: formData.status,
+        stock: Number(formData.stock),
+        sku: formData.sku || null,
+        isActive: formData.isActive,
       };
 
-      await productsService.update(Number(id), updatedProduct);
+      await productsService.update(id, updatedProduct);
+      toast.success('Producto actualizado exitosamente');
       navigate("/products");
     } catch (error) {
       console.error("Error al actualizar el producto:", error);
+      toast.error('Error al actualizar el producto');
     }
   };
 
@@ -178,26 +186,13 @@ export const EditProductPage = () => {
               </div>
 
               <div className="form-field">
-                <label className="field-label">
-                  Categoría <span className="required">*</span>
-                </label>
-                <select
-                  name="category"
-                  value={formData.category}
+                <Input
+                  label="Descripción"
+                  name="description"
+                  placeholder="Descripción del producto (opcional)"
+                  value={formData.description}
                   onChange={handleChange}
-                  className={`field-select ${
-                    errors.category ? "field-select--error" : ""
-                  }`}
-                  required
-                >
-                  <option value="">Selecciona una categoría</option>
-                  <option value="Cuidado automotriz">Cuidado automotriz</option>
-                  <option value="Lujo">Lujo</option>
-                  <option value="Servicio">Servicio</option>
-                </select>
-                {errors.category && (
-                  <span className="field-error">{errors.category}</span>
-                )}
+                />
               </div>
 
               <div className="form-field">
@@ -228,18 +223,40 @@ export const EditProductPage = () => {
               </div>
 
               <div className="form-field">
+                <Input
+                  label="Stock"
+                  name="stock"
+                  type="number"
+                  placeholder="0"
+                  value={formData.stock}
+                  onChange={handleChange}
+                  error={errors.stock}
+                />
+              </div>
+
+              <div className="form-field">
+                <Input
+                  label="SKU (opcional)"
+                  name="sku"
+                  placeholder="Ej: PROD-001"
+                  value={formData.sku}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-field">
                 <label className="field-label">
                   Estado <span className="required">*</span>
                 </label>
                 <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
+                  name="isActive"
+                  value={formData.isActive.toString()}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.value === 'true' }))}
                   className="field-select"
                   required
                 >
-                  <option value="active">Activo</option>
-                  <option value="inactive">Inactivo</option>
+                  <option value="true">Activo</option>
+                  <option value="false">Inactivo</option>
                 </select>
               </div>
             </div>

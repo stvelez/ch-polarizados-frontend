@@ -1,21 +1,19 @@
-import './ProductCard.scss';
-import type { Product } from '../../types/product.types';
+import './SaleCard.scss';
+import type { Sale } from '../../types/sale.types';
 
-interface ProductCardProps {
-  product: Product;
+interface SaleCardProps {
+  sale: Sale;
   onView: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
-  product,
+export const SaleCard: React.FC<SaleCardProps> = ({
+  sale,
   onView,
   onEdit,
   onDelete,
 }) => {
-  const getInitial = (name: string) => name.charAt(0).toUpperCase();
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -24,44 +22,51 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     }).format(price);
   };
 
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('es-CO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return { label: 'Completada', class: 'status-badge--completed' };
+      case 'pending':
+        return { label: 'Pendiente', class: 'status-badge--pending' };
+      case 'cancelled':
+        return { label: 'Cancelada', class: 'status-badge--cancelled' };
+      default:
+        return { label: status, class: 'status-badge--default' };
+    }
+  };
+
+  const statusInfo = getStatusBadge(sale.status);
+
   return (
-    <tr className="product-card">
-      <td className="product-card__name">
-        <div className="name-container">
-          <div className="product-card__avatar">
-            <span className="avatar-initial">{getInitial(product.name)}</span>
-          </div>
-          <div className="name-info">
-            <div className="name-text">{product.name}</div>
-            {product.description && (
-              <div className="name-description">{product.description}</div>
-            )}
-          </div>
-        </div>
+    <tr className="sale-card">
+      <td className="sale-card__number">
+        <span className="badge-number">{sale.saleNumber}</span>
       </td>
 
-      <td className="product-card__sku">
-        <span className="sku-badge">{product.sku || 'Sin SKU'}</span>
-      </td>
+      <td className="sale-card__date">{formatDate(sale.saleDate)}</td>
 
-      <td className="product-card__price">{formatPrice(product.price)}</td>
+      <td className="sale-card__total">{formatPrice(sale.total)}</td>
 
-      <td className="product-card__stock">
-        <span className={`stock-badge ${product.stock > 0 ? 'stock-badge--available' : 'stock-badge--empty'}`}>
-          {product.stock} unidades
+      <td className="sale-card__status">
+        <span className={`status-badge ${statusInfo.class}`}>
+          {statusInfo.label}
         </span>
       </td>
 
-      <td className="product-card__status">
-        <span className={`status-badge status-badge--${product.isActive ? 'active' : 'inactive'}`}>
-          {product.isActive ? 'Activo' : 'Inactivo'}
-        </span>
-      </td>
+      <td className="sale-card__date-created">{formatDate(sale.createdAt)}</td>
 
-      <td className="product-card__actions">
+      <td className="sale-card__actions">
         <button
           className="action-btn action-btn--view"
-          onClick={() => onView(product.id)}
+          onClick={() => onView(sale.id)}
           title="Ver"
         >
           <svg
@@ -79,7 +84,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </button>
         <button
           className="action-btn action-btn--edit"
-          onClick={() => onEdit(product.id)}
+          onClick={() => onEdit(sale.id)}
           title="Editar"
         >
           <svg
@@ -97,7 +102,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </button>
         <button
           className="action-btn action-btn--delete"
-          onClick={() => onDelete(product.id)}
+          onClick={() => onDelete(sale.id)}
           title="Eliminar"
         >
           <svg
