@@ -44,7 +44,7 @@ export const LoginPage = () => {
             </p>
             <ul>
               <li>
-                <strong>Email:</strong> test@correo.com
+                <strong>Email:</strong> admin@chpolarizados.com
               </li>
               <li>
                 <strong>Password:</strong> 123456
