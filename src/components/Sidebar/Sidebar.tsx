@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import './Sidebar.scss';
+import type { JSX } from 'react';
 
 interface SidebarProps {
   isOpen?: boolean;
