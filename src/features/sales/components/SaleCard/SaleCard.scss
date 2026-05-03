@@ -107,3 +107,57 @@
     }
   }
 }
+
+@media (max-width: 768px) {
+  .sale-card {
+    display: grid;
+    gap: 14px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 18px 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+
+    &:hover {
+      background: white;
+    }
+
+    td {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0;
+      border: none;
+
+      &::before {
+        content: attr(data-label);
+        font-size: 12px;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        flex-shrink: 0;
+      }
+    }
+
+    &__number,
+    &__date,
+    &__total,
+    &__status,
+    &__date-created {
+      font-size: 14px;
+      color: #1f2937;
+    }
+
+    &__actions {
+      align-items: center;
+
+      .action-btn {
+        width: 40px;
+        height: 40px;
+        background-color: #f9fafb;
+      }
+    }
+  }
+}

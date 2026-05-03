@@ -124,7 +124,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
         <div className="sidebar-overlay" onClick={onClose} />
       )}
 
-      <aside className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}>
+      <aside id="app-sidebar" className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}>
         {/* Logo/Brand */}
         <div className="sidebar__brand">
           <div className="brand-logo">

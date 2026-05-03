@@ -30,7 +30,7 @@ export const UserCard: React.FC<UserCardProps> = ({
 
   return (
     <tr className="user-card">
-      <td className="user-card__name">
+      <td className="user-card__name" data-label="Usuario">
         <div className="name-container">
           <div className="user-card__avatar">
             <span className="avatar-initial">{getInitial(user.name)}</span>
@@ -42,21 +42,23 @@ export const UserCard: React.FC<UserCardProps> = ({
         </div>
       </td>
 
-      <td className="user-card__role">
+      <td className="user-card__role" data-label="Rol">
         <span className={`role-badge ${getRoleBadgeClass(user.role)}`}>
           {user.role}
         </span>
       </td>
 
-      <td className="user-card__status">
+      <td className="user-card__status" data-label="Estado">
         <span className={`status-badge ${user.isActive ? 'status-badge--active' : 'status-badge--inactive'}`}>
           {user.isActive ? 'Activo' : 'Inactivo'}
         </span>
       </td>
 
-      <td className="user-card__date">{formatDate(user.createdAt)}</td>
+      <td className="user-card__date" data-label="Registro">
+        {formatDate(user.createdAt)}
+      </td>
 
-      <td className="user-card__actions">
+      <td className="user-card__actions" data-label="Acciones">
         <div className="actions-container">
           <button
             className="action-btn action-btn--toggle"

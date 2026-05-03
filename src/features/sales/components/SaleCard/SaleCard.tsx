@@ -47,23 +47,29 @@ export const SaleCard: React.FC<SaleCardProps> = ({
 
   return (
     <tr className="sale-card">
-      <td className="sale-card__number">
+      <td className="sale-card__number" data-label="Venta">
         <span className="badge-number">{sale.saleNumber}</span>
       </td>
 
-      <td className="sale-card__date">{formatDate(sale.saleDate)}</td>
+      <td className="sale-card__date" data-label="Fecha">
+        {formatDate(sale.saleDate)}
+      </td>
 
-      <td className="sale-card__total">{formatPrice(sale.total)}</td>
+      <td className="sale-card__total" data-label="Total">
+        {formatPrice(sale.total)}
+      </td>
 
-      <td className="sale-card__status">
+      <td className="sale-card__status" data-label="Estado">
         <span className={`status-badge ${statusInfo.class}`}>
           {statusInfo.label}
         </span>
       </td>
 
-      <td className="sale-card__date-created">{formatDate(sale.createdAt)}</td>
+      <td className="sale-card__date-created" data-label="Creada">
+        {formatDate(sale.createdAt)}
+      </td>
 
-      <td className="sale-card__actions">
+      <td className="sale-card__actions" data-label="Acciones">
         <button
           className="action-btn action-btn--view"
           onClick={() => onView(sale.id)}

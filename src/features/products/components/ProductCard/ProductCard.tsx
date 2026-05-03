@@ -26,7 +26,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <tr className="product-card">
-      <td className="product-card__name">
+      <td className="product-card__name" data-label="Producto">
         <div className="name-container">
           <div className="product-card__avatar">
             <span className="avatar-initial">{getInitial(product.name)}</span>
@@ -40,25 +40,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </td>
 
-      <td className="product-card__sku">
+      <td className="product-card__sku" data-label="SKU">
         <span className="sku-badge">{product.sku || 'Sin SKU'}</span>
       </td>
 
-      <td className="product-card__price">{formatPrice(product.price)}</td>
+      <td className="product-card__price" data-label="Precio">
+        {formatPrice(product.price)}
+      </td>
 
-      <td className="product-card__stock">
+      <td className="product-card__stock" data-label="Stock">
         <span className={`stock-badge ${product.stock > 0 ? 'stock-badge--available' : 'stock-badge--empty'}`}>
           {product.stock} unidades
         </span>
       </td>
 
-      <td className="product-card__status">
+      <td className="product-card__status" data-label="Estado">
         <span className={`status-badge status-badge--${product.isActive ? 'active' : 'inactive'}`}>
           {product.isActive ? 'Activo' : 'Inactivo'}
         </span>
       </td>
 
-      <td className="product-card__actions">
+      <td className="product-card__actions" data-label="Acciones">
         <button
           className="action-btn action-btn--view"
           onClick={() => onView(product.id)}

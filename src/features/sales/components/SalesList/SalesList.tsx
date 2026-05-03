@@ -94,7 +94,11 @@ export const SalesList = () => {
             Administra y realiza seguimiento de todas tus ventas
           </p>
         </div>
-        <Button variant="primary" onClick={handleNewSale}>
+        <Button
+          variant="primary"
+          onClick={handleNewSale}
+          className="sales-list__add-button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -176,7 +180,7 @@ export const SalesList = () => {
         ) : filteredSales.length === 0 ? (
           <div className="table-empty">No se encontraron ventas</div>
         ) : (
-          <table>
+          <table className="sales-table">
             <thead>
               <tr>
                 <th>DOC. DE VENTA</th>

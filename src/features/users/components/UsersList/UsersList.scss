@@ -7,6 +7,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 32px;
+    gap: 16px;
 
     .header-content {
       .header-title {
@@ -89,6 +90,10 @@
       gap: 16px;
     }
 
+    &__add-button {
+      width: 100%;
+    }
+
     &__filters {
       .search-container {
         max-width: 100%;
@@ -118,6 +123,10 @@
     }
 
     &__content {
+      .table-container {
+        overflow-x: auto;
+      }
+
       .users-table {
         font-size: 14px;
 
@@ -128,6 +137,33 @@
         tbody td {
           padding: 12px 16px;
         }
+      }
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .users-list {
+    &__content {
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+
+      .table-container {
+        overflow: visible;
+      }
+
+      .users-table {
+        display: block;
+      }
+
+      .users-table thead {
+        display: none;
+      }
+
+      .users-table tbody {
+        display: grid;
+        gap: 16px;
       }
     }
   }

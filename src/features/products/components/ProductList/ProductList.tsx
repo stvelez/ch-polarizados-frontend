@@ -17,22 +17,13 @@ export const ProductList = () => {
     try {
       setLoading(true);
       const response = await productsService.getAll();
-      console.log('Response from API:', response);
-      console.log('Type of response:', typeof response);
-      console.log('Is Array?:', Array.isArray(response));
-      
-      // Asegurarse de que response sea un array
+
       if (Array.isArray(response)) {
-        console.log('Setting products as array, length:', response.length);
         setProducts(response);
       } else if (response && typeof response === 'object' && 'products' in response) {
-        // Si la respuesta tiene una propiedad 'products' que es un array
-        console.log('Setting products from response.products');
         const productsArray = (response as any).products;
         setProducts(Array.isArray(productsArray) ? productsArray : []);
       } else if (response && typeof response === 'object' && 'data' in response) {
-        // Si la respuesta tiene una propiedad 'data' que es un array
-        console.log('Setting products from response.data');
         const dataArray = (response as any).data;
         setProducts(Array.isArray(dataArray) ? dataArray : []);
       } else {
@@ -73,9 +64,6 @@ export const ProductList = () => {
     navigate('/products/add');
   };
 
-  console.log('Products state before filter:', products);
-  console.log('Is products an array?:', Array.isArray(products));
-
   const filteredProducts = Array.isArray(products) 
     ? products.filter((product) => {
         const matchesSearch =
@@ -97,7 +85,11 @@ export const ProductList = () => {
             Administra tu inventario de productos de manera eficiente
           </p>
         </div>
-        <Button variant="primary" onClick={handleAddProduct}>
+        <Button
+          variant="primary"
+          onClick={handleAddProduct}
+          className="product-list__add-button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -171,7 +163,7 @@ export const ProductList = () => {
         ) : filteredProducts.length === 0 ? (
           <div className="table-empty">No se encontraron productos</div>
         ) : (
-          <table>
+          <table className="products-table">
             <thead>
               <tr>
                 <th>PRODUCTO</th>

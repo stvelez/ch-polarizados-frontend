@@ -7,6 +7,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 32px;
+    gap: 16px;
 
     .header-content {
       .header-title {
@@ -99,7 +100,7 @@
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-    table {
+    .products-table {
       width: 100%;
       border-collapse: collapse;
 
@@ -143,6 +144,10 @@
       gap: 16px;
     }
 
+    &__add-button {
+      width: 100%;
+    }
+
     &__filters {
       .filter-controls {
         flex-direction: column;
@@ -155,6 +160,68 @@
         .category-filter {
           min-width: 100%;
         }
+      }
+    }
+
+    &__table {
+      overflow-x: auto;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .product-list {
+    padding: 16px;
+
+    &__header {
+      .header-content {
+        .header-title {
+          font-size: 24px;
+        }
+
+        .header-subtitle {
+          font-size: 14px;
+        }
+      }
+    }
+
+    &__filters {
+      padding: 16px;
+
+      .filter-info {
+        align-items: flex-start;
+
+        .info-icon {
+          width: 48px;
+          height: 48px;
+        }
+      }
+
+      .filter-controls {
+        gap: 12px;
+      }
+
+      .filter-info-text {
+        text-align: left;
+      }
+    }
+
+    &__table {
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+
+      .products-table {
+        display: block;
+      }
+
+      .products-table thead {
+        display: none;
+      }
+
+      .products-table tbody {
+        display: grid;
+        gap: 16px;
       }
     }
   }

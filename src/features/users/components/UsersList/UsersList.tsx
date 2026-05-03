@@ -93,7 +93,11 @@ export const UsersList = () => {
             Administra los usuarios del sistema
           </p>
         </div>
-        <Button variant="primary" onClick={handleAddUser}>
+        <Button
+          variant="primary"
+          onClick={handleAddUser}
+          className="users-list__add-button"
+        >
           + Agregar Usuario
         </Button>
       </div>
