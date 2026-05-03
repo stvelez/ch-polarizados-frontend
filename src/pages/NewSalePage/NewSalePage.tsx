@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Button, Input } from '../../components';
@@ -35,41 +35,42 @@ export const NewSalePage = () => {
 
   const [turnNumber] = useState(getTurnNumber());
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await productsService.getAll();
-        
-        let productsArray: Product[] = [];
-        
-        // Manejar diferentes formatos de respuesta de la API
-        if (Array.isArray(response)) {
-          productsArray = response;
-        } else if (response && typeof response === 'object' && 'data' in response) {
-          productsArray = Array.isArray((response as any).data) ? (response as any).data : [];
-        } else if (response && typeof response === 'object' && 'products' in response) {
-          productsArray = Array.isArray((response as any).products) ? (response as any).products : [];
-        }
-        
-        // Convertir precios de string a number si es necesario
-        const normalizedProducts = productsArray.map(p => ({
-          ...p,
-          price: typeof p.price === 'string' ? parseFloat(p.price) : p.price,
-        })).filter(p => p.isActive);
-        
-        setProducts(normalizedProducts);
-        setFilteredProducts(normalizedProducts);
-      } catch (error) {
-        console.error('Error loading products:', error);
-        setProducts([]);
-        setFilteredProducts([]);
-      } finally {
-        setLoading(false);
+  const loadProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await productsService.getAll();
+
+      let productsArray: Product[] = [];
+
+      if (Array.isArray(response)) {
+        productsArray = response;
+      } else if (response && typeof response === 'object' && 'data' in response) {
+        productsArray = Array.isArray((response as any).data) ? (response as any).data : [];
+      } else if (response && typeof response === 'object' && 'products' in response) {
+        productsArray = Array.isArray((response as any).products) ? (response as any).products : [];
       }
-    };
-    loadProducts();
+
+      const normalizedProducts = productsArray
+        .map((product) => ({
+          ...product,
+          price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+        }))
+        .filter((product) => product.isActive);
+
+      setProducts(normalizedProducts);
+      setFilteredProducts(normalizedProducts);
+    } catch (error) {
+      console.error('Error loading products:', error);
+      setProducts([]);
+      setFilteredProducts([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
 
   useEffect(() => {
     let filtered = products;
@@ -87,7 +88,48 @@ export const NewSalePage = () => {
     setFilteredProducts(filtered);
   }, [searchTerm, selectedCategory, products]);
 
+  const getSelectedQuantity = (productId: string) => {
+    return saleItems.find((item) => item.product.id === productId)?.quantity ?? 0;
+  };
+
+  const getAvailableStock = (productId: string) => {
+    return products.find((product) => product.id === productId)?.stock ?? 0;
+  };
+
+  const getRemainingStock = (productId: string) => {
+    return Math.max(getAvailableStock(productId) - getSelectedQuantity(productId), 0);
+  };
+
+  const getRequestErrorMessage = (error: unknown) => {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'response' in error &&
+      error.response &&
+      typeof error.response === 'object' &&
+      'data' in error.response &&
+      error.response.data &&
+      typeof error.response.data === 'object' &&
+      'message' in error.response.data &&
+      typeof error.response.data.message === 'string'
+    ) {
+      return error.response.data.message;
+    }
+
+    return 'Error al registrar la venta. Por favor, intenta nuevamente.';
+  };
+
   const addProductToSale = (product: Product) => {
+    if (product.stock <= 0) {
+      toast.error(`"${product.name}" no tiene stock disponible`);
+      return;
+    }
+
+    if (getRemainingStock(product.id) <= 0) {
+      toast.warning(`Solo hay ${product.stock} unidades disponibles de "${product.name}"`);
+      return;
+    }
+
     const existingItem = saleItems.find((item) => item.product.id === product.id);
 
     if (existingItem) {
@@ -118,6 +160,17 @@ export const NewSalePage = () => {
   const updateQuantity = (productId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
       removeProduct(productId);
+      return;
+    }
+
+    const availableStock = getAvailableStock(productId);
+    const productName =
+      products.find((product) => product.id === productId)?.name ??
+      saleItems.find((item) => item.product.id === productId)?.product.name ??
+      'este producto';
+
+    if (newQuantity > availableStock) {
+      toast.warning(`Solo hay ${availableStock} unidades disponibles de "${productName}"`);
       return;
     }
 
@@ -187,12 +240,8 @@ export const NewSalePage = () => {
         observations: observations.trim() || undefined,
       };
 
-      console.log('Enviando venta a la API:', saleData);
-
-      // Registrar la venta en el backend
       const response = await salesService.create(saleData);
 
-      console.log('Venta registrada exitosamente:', response);
       toast.success(`¡Venta registrada exitosamente! Número: ${response.saleNumber}`);
       
       // Redirigir a la página de ventas después de 2 segundos
@@ -201,7 +250,8 @@ export const NewSalePage = () => {
       }, 2000);
     } catch (error) {
       console.error('Error al registrar la venta:', error);
-      toast.error('Error al registrar la venta. Por favor, intenta nuevamente.');
+      toast.error(getRequestErrorMessage(error));
+      await loadProducts();
     } finally {
       setRegistering(false);
     }
@@ -281,11 +331,16 @@ export const NewSalePage = () => {
               filteredProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="product-item"
+                  className={`product-item ${product.stock <= 0 ? 'product-item--disabled' : ''}`}
                   onClick={() => addProductToSale(product)}
                 >
-                  <div className="product-avatar">
-                    <span>{product.name.charAt(0).toUpperCase()}</span>
+                  <div className="product-item__top">
+                    <div className="product-avatar">
+                      <span>{product.name.charAt(0).toUpperCase()}</span>
+                    </div>
+                    <div className={`product-stock-badge ${product.stock > 0 ? '' : 'product-stock-badge--empty'}`}>
+                      {product.stock > 0 ? `${product.stock} disp.` : 'Agotado'}
+                    </div>
                   </div>
                   <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>
@@ -298,9 +353,11 @@ export const NewSalePage = () => {
                         {product.sku}
                       </p>
                     )}
-                    {product.stock > 0 && (
-                      <p className="product-stock">Stock: {product.stock}</p>
-                    )}
+                    <p className={`product-stock ${product.stock > 0 ? '' : 'product-stock--empty'}`}>
+                      {product.stock > 0
+                        ? `Stock disponible: ${getRemainingStock(product.id)}`
+                        : 'Producto sin stock'}
+                    </p>
                   </div>
                   {saleItems.some((item) => item.product.id === product.id) && (
                     <div className="product-badge">
@@ -451,7 +508,10 @@ export const NewSalePage = () => {
                         −
                       </button>
                       <span className="quantity">Total: {formatPrice(item.total)}</span>
-                      <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)}>
+                      <button
+                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                        disabled={item.quantity >= getAvailableStock(item.product.id)}
+                      >
                         +
                       </button>
                     </div>
