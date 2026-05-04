@@ -3,6 +3,11 @@ import type { Product, ProductsResponse } from '../features/products/types/produ
 
 const PRODUCTS_ENDPOINT = '/products';
 
+const normalizeProduct = (product: Product): Product => ({
+  ...product,
+  price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+});
+
 // DTOs actualizados según schema de Prisma
 export interface CreateProductDto {
   name: string;
@@ -38,19 +43,26 @@ export const productsService = {
     }
     
     // Normalizar precios (convertir string a number)
-    return productsArray.map(p => ({
-      ...p,
-      price: typeof p.price === 'string' ? parseFloat(p.price) : p.price,
-    }));
+    return productsArray.map(normalizeProduct);
   },
 
   getById: async (id: string): Promise<Product> => {
     const response = await api.get<any>(`${PRODUCTS_ENDPOINT}/${id}`);
-    const product = Array.isArray(response.data) ? response.data[0] : response.data;
-    return {
-      ...product,
-      price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
-    };
+    let product: Product | null = null;
+
+    if (Array.isArray(response.data)) {
+      product = response.data[0] ?? null;
+    } else if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+      product = (response.data.data as Product) ?? null;
+    } else {
+      product = response.data;
+    }
+
+    if (!product) {
+      throw new Error('Producto no encontrado');
+    }
+
+    return normalizeProduct(product);
   },
 
   create: async (productData: CreateProductDto): Promise<Product> => {

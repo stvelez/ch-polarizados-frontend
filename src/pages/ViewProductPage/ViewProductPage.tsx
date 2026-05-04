@@ -58,6 +58,9 @@ export const ViewProductPage = () => {
     });
   };
 
+  const productName = product?.name?.trim() || "Producto sin nombre";
+  const productInitial = productName.charAt(0).toUpperCase();
+
   if (loading) {
     return (
       <div className="view-product-page">
@@ -116,11 +119,11 @@ export const ViewProductPage = () => {
           <div className="detail-header">
             <div className="product-avatar">
               <span className="avatar-initial">
-                {product.name.charAt(0).toUpperCase()}
+                {productInitial}
               </span>
             </div>
             <div className="product-main-info">
-              <h2 className="product-name">{product.name}</h2>
+              <h2 className="product-name">{productName}</h2>
               <span
                 className={`status-badge status-badge--${
                   product.isActive ? "active" : "inactive"
@@ -141,7 +144,7 @@ export const ViewProductPage = () => {
 
               <div className="info-item">
                 <label className="info-label">Nombre</label>
-                <p className="info-value">{product.name}</p>
+                <p className="info-value">{productName}</p>
               </div>
 
               <div className="info-item">
