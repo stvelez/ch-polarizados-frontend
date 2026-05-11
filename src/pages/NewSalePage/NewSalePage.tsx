@@ -13,6 +13,8 @@ interface SaleItem {
   total: number;
 }
 
+const SALE_CATEGORIES = ['polarizado', 'sonido', 'accesorios', 'servicio'] as const;
+
 export const NewSalePage = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,6 +29,8 @@ export const NewSalePage = () => {
   const [observations, setObservations] = useState('');
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editingPrice, setEditingPrice] = useState('');
 
   // Obtener el número de turno
   const getTurnNumber = () => {
@@ -84,7 +88,10 @@ export const NewSalePage = () => {
       );
     }
 
-    // Los productos vienen ya filtrados por categoría desde la API, así que Todos muestra todos
+    if (selectedCategory !== 'Todos') {
+      filtered = filtered.filter((p) => p.category === selectedCategory);
+    }
+
     setFilteredProducts(filtered);
   }, [searchTerm, selectedCategory, products]);
 
@@ -120,12 +127,12 @@ export const NewSalePage = () => {
   };
 
   const addProductToSale = (product: Product) => {
-    if (product.stock <= 0) {
+    if (product.inventariable && product.stock <= 0) {
       toast.error(`"${product.name}" no tiene stock disponible`);
       return;
     }
 
-    if (getRemainingStock(product.id) <= 0) {
+    if (product.inventariable && getRemainingStock(product.id) <= 0) {
       toast.warning(`Solo hay ${product.stock} unidades disponibles de "${product.name}"`);
       return;
     }
@@ -190,6 +197,29 @@ export const NewSalePage = () => {
   const removeProduct = (productId: string) => {
     setSaleItems(saleItems.filter((item) => item.product.id !== productId));
   };
+
+  const startEditPrice = (item: SaleItem) => {
+    setEditingItemId(item.product.id);
+    setEditingPrice(item.unitPrice.toString());
+  };
+
+  const confirmEditPrice = (productId: string) => {
+    const newPrice = parseFloat(editingPrice);
+    if (isNaN(newPrice) || newPrice <= 0) {
+      toast.error('Ingresa un precio válido');
+      return;
+    }
+    setSaleItems(
+      saleItems.map((item) =>
+        item.product.id === productId
+          ? { ...item, unitPrice: newPrice, total: newPrice * item.quantity }
+          : item
+      )
+    );
+    setEditingItemId(null);
+  };
+
+  const cancelEditPrice = () => setEditingItemId(null);
 
   const calculateSubtotal = () => {
     return saleItems.reduce((sum, item) => sum + item.total, 0);
@@ -257,7 +287,7 @@ export const NewSalePage = () => {
     }
   };
 
-  const categories = ['Todos', 'Películas de Polarizado', 'Accesorios', 'Limpieza', 'Kits'];
+  const categories = ['Todos', ...SALE_CATEGORIES];
 
   return (
     <div className="new-sale-page">
@@ -317,7 +347,7 @@ export const NewSalePage = () => {
                 className={`category-tab ${selectedCategory === category ? 'category-tab--active' : ''}`}
                 onClick={() => setSelectedCategory(category)}
               >
-                {category}
+                {category === 'Todos' ? 'Todos' : category.charAt(0).toUpperCase() + category.slice(1)}
               </button>
             ))}
           </div>
@@ -331,16 +361,18 @@ export const NewSalePage = () => {
               filteredProducts.map((product) => (
                 <div
                   key={product.id}
-                  className={`product-item ${product.stock <= 0 ? 'product-item--disabled' : ''}`}
+                  className={`product-item ${product.inventariable && product.stock <= 0 ? 'product-item--disabled' : ''}`}
                   onClick={() => addProductToSale(product)}
                 >
                   <div className="product-item__top">
                     <div className="product-avatar">
                       <span>{product.name.charAt(0).toUpperCase()}</span>
                     </div>
-                    <div className={`product-stock-badge ${product.stock > 0 ? '' : 'product-stock-badge--empty'}`}>
-                      {product.stock > 0 ? `${product.stock} disp.` : 'Agotado'}
-                    </div>
+                    {product.inventariable && (
+                      <div className={`product-stock-badge ${product.stock > 0 ? '' : 'product-stock-badge--empty'}`}>
+                        {product.stock > 0 ? `${product.stock} disp.` : 'Agotado'}
+                      </div>
+                    )}
                   </div>
                   <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>
@@ -353,11 +385,13 @@ export const NewSalePage = () => {
                         {product.sku}
                       </p>
                     )}
-                    <p className={`product-stock ${product.stock > 0 ? '' : 'product-stock--empty'}`}>
-                      {product.stock > 0
-                        ? `Stock disponible: ${getRemainingStock(product.id)}`
-                        : 'Producto sin stock'}
-                    </p>
+                    {product.inventariable && (
+                      <p className={`product-stock ${product.stock <= 0 ? 'product-stock--empty' : ''}`}>
+                        {product.stock > 0
+                          ? `Stock disponible: ${getRemainingStock(product.id)}`
+                          : 'Producto sin stock'}
+                      </p>
+                    )}
                   </div>
                   {saleItems.some((item) => item.product.id === product.id) && (
                     <div className="product-badge">
@@ -432,7 +466,6 @@ export const NewSalePage = () => {
           </div>
 
           <div className="sale-items">
-            <h3>Servicio de instalación</h3>
             {saleItems.length === 0 ? (
               <div className="empty-cart">
                 <p>No hay productos agregados</p>
@@ -443,14 +476,31 @@ export const NewSalePage = () => {
                   <div className="item-header">
                     <div className="item-info">
                       <h4>{item.product.name}</h4>
-                      <p>Precio unitario: {formatPrice(item.unitPrice)}</p>
+                      {editingItemId === item.product.id ? (
+                        <div className="price-edit">
+                          <input
+                            type="number"
+                            className="price-edit__input"
+                            value={editingPrice}
+                            onChange={(e) => setEditingPrice(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') confirmEditPrice(item.product.id);
+                              if (e.key === 'Escape') cancelEditPrice();
+                            }}
+                            autoFocus
+                          />
+                          <button className="price-edit__confirm" onClick={() => confirmEditPrice(item.product.id)}>✓</button>
+                          <button className="price-edit__cancel" onClick={cancelEditPrice}>✕</button>
+                        </div>
+                      ) : (
+                        <p>Precio unitario: {formatPrice(item.unitPrice)}</p>
+                      )}
                     </div>
                     <div className="item-actions">
                       <button
                         className="icon-btn"
-                        onClick={() =>
-                          updateQuantity(item.product.id, item.quantity - 1)
-                        }
+                        title="Editar precio"
+                        onClick={() => startEditPrice(item)}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

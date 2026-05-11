@@ -6,7 +6,9 @@ export interface Product {
   price: number; // Decimal en la BD
   stock: number;
   sku: string | null;
+  category: string | null;
   isActive: boolean;
+  inventariable: boolean; // false = servicio sin control de stock
   createdAt: string; // DateTime
   updatedAt: string; // DateTime
 }

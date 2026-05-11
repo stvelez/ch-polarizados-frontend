@@ -18,6 +18,15 @@ export interface CreateSaleDto {
   observations?: string;
 }
 
+export interface SaleItemDetail {
+  id: string;
+  productId: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
+  product: { id: string; name: string; sku: string };
+}
+
 export interface Sale {
   id: string;
   saleNumber: string;
@@ -27,6 +36,8 @@ export interface Sale {
   saleDate: string;
   createdAt: string;
   updatedAt: string;
+  items?: SaleItemDetail[];
+  user?: { id: string; name: string; email: string };
 }
 
 export interface SalesResponse {
@@ -45,8 +56,22 @@ export const salesService = {
 
   getById: async (id: string): Promise<Sale> => {
     const response = await api.get<any>(`${SALES_ENDPOINT}/${id}`);
-    const sale = Array.isArray(response.data) ? response.data[0] : response.data;
-    return sale;
+    const body = response.data;
+    const raw: Sale =
+      body && typeof body === 'object' && 'data' in body
+        ? body.data
+        : Array.isArray(body)
+        ? body[0]
+        : body;
+    return {
+      ...raw,
+      total: Number(raw.total),
+      items: raw.items?.map((item) => ({
+        ...item,
+        price: Number(item.price),
+        subtotal: Number(item.subtotal),
+      })),
+    };
   },
 
   create: async (saleData: CreateSaleDto): Promise<Sale> => {

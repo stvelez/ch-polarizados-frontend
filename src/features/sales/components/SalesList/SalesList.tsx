@@ -44,14 +44,10 @@ export const SalesList = () => {
   }, [fetchSales]);
 
   const handleView = (id: string) => {
-    navigate(`/sales/view/${id}`);
+    navigate(`/sales/${id}`);
   };
 
-  const handleEdit = (id: string) => {
-    navigate(`/sales/edit/${id}`);
-  };
-
-  const handleDelete = async (id: string) => {
+const handleDelete = async (id: string) => {
     if (confirm('¿Estás seguro de que deseas eliminar esta venta?')) {
       try {
         await salesService.delete(id);
@@ -197,7 +193,6 @@ export const SalesList = () => {
                   key={sale.id}
                   sale={sale}
                   onView={handleView}
-                  onEdit={handleEdit}
                   onDelete={handleDelete}
                 />
               ))}

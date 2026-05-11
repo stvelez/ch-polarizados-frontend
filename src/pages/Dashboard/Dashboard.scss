@@ -2,7 +2,12 @@
   padding: 40px;
 
   &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
     margin-bottom: 32px;
+    gap: 16px;
+    flex-wrap: wrap;
   }
 
   &__title {
@@ -23,13 +28,68 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 24px;
     margin-bottom: 32px;
+    transition: opacity 0.2s ease;
+
+    &--loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
   }
 
-  &__content {
-    margin-top: 32px;
+  &__panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
   }
 }
 
+// Selector de periodo
+.period-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 6px 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  &__btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #6b7280;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    line-height: 1;
+
+    &:hover:not(:disabled) {
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
+
+  &__label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    min-width: 120px;
+    text-align: center;
+  }
+}
+
+// Tarjetas KPI
 .stat-card {
   background: white;
   border-radius: 12px;
@@ -76,6 +136,7 @@
 
   &__content {
     flex: 1;
+    min-width: 0;
   }
 
   &__label {
@@ -89,6 +150,9 @@
     font-weight: 700;
     color: #1f2937;
     margin: 0 0 8px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__change {
@@ -103,28 +167,165 @@
     &--down {
       color: #ef4444;
     }
+
+    &--neutral {
+      color: #9ca3af;
+    }
   }
 }
 
+// Tarjetas de contenido inferior
 .content-card {
   background: white;
   border-radius: 12px;
-  padding: 40px;
+  padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  text-align: center;
 
   &__title {
-    font-size: 24px;
+    font-size: 17px;
     font-weight: 600;
     color: #1f2937;
-    margin-bottom: 12px;
+    margin: 0 0 16px 0;
   }
 
-  &__text {
-    font-size: 16px;
+  &__empty {
+    font-size: 14px;
+    color: #9ca3af;
+    text-align: center;
+    padding: 24px 0;
+    margin: 0;
+  }
+}
+
+// Tabla de ventas recientes
+.sales-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
     color: #6b7280;
-    max-width: 600px;
-    margin: 0 auto;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0 12px 10px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  td {
+    padding: 12px 12px 12px 0;
+    color: #374151;
+    border-bottom: 1px solid #f9fafb;
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  &__number {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 13px;
+  }
+
+  &__total {
+    font-weight: 600;
+    color: #1f2937;
+  }
+}
+
+// Badge de estado
+.status {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+
+  &--completed {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &--pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &--cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+// Confirmación stock saludable
+.stock-ok {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0;
+  color: #10b981;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: #6b7280;
+  }
+}
+
+// Lista de alertas de stock
+.stock-alert-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stock-alert-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+
+  &__name {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    margin-right: 12px;
+  }
+
+  &__qty {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ea580c;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &--zero {
+      color: #dc2626;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 1024px) {
+  .dashboard {
+    &__panels {
+      grid-template-columns: 1fr;
+    }
   }
 }
 
@@ -144,6 +345,12 @@
   .stat-card {
     &__value {
       font-size: 24px;
+    }
+  }
+
+  .period-selector {
+    &__label {
+      min-width: 100px;
     }
   }
 }

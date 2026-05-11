@@ -689,6 +689,62 @@
   }
 }
 
+.price-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+
+  &__input {
+    width: 100px;
+    padding: 4px 8px;
+    border: 1.5px solid #10b981;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1f2937;
+    outline: none;
+
+    &:focus {
+      border-color: #059669;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+    }
+  }
+
+  &__confirm {
+    padding: 4px 8px;
+    border: none;
+    background-color: #10b981;
+    color: white;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: #059669;
+    }
+  }
+
+  &__cancel {
+    padding: 4px 8px;
+    border: none;
+    background-color: #e5e7eb;
+    color: #6b7280;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: #d1d5db;
+      color: #374151;
+    }
+  }
+}
+
 @media (max-width: 1024px) {
   .new-sale-page {
     &__content {

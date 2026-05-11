@@ -5,6 +5,8 @@ import { Button, Input } from "../../components";
 import "./EditProductPage.scss";
 import { productsService } from "../../services";
 
+const PRODUCT_CATEGORIES = ['polarizado', 'sonido', 'accesorios', 'servicio'] as const;
+
 export const EditProductPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -15,7 +17,9 @@ export const EditProductPage = () => {
     price: "",
     stock: "0",
     sku: "",
+    category: "",
     isActive: true,
+    inventariable: false,
   });
 
   const [errors, setErrors] = useState({
@@ -40,7 +44,9 @@ export const EditProductPage = () => {
           price: product.price.toString(),
           stock: product.stock.toString(),
           sku: product.sku || "",
+          category: product.category || "",
           isActive: product.isActive,
+          inventariable: product.inventariable ?? false,
         });
       } catch (error) {
         console.error("Error al cargar el producto:", error);
@@ -61,7 +67,6 @@ export const EditProductPage = () => {
       ...prev,
       [name]: value,
     }));
-    // Limpiar error al escribir
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({
         ...prev,
@@ -113,9 +118,11 @@ export const EditProductPage = () => {
         name: formData.name,
         description: formData.description || null,
         price: Number(formData.price),
-        stock: Number(formData.stock),
+        stock: formData.inventariable ? Number(formData.stock) : 0,
         sku: formData.sku || null,
+        category: formData.category || null,
         isActive: formData.isActive,
+        inventariable: formData.inventariable,
       };
 
       await productsService.update(id, updatedProduct);
@@ -223,16 +230,38 @@ export const EditProductPage = () => {
               </div>
 
               <div className="form-field">
-                <Input
-                  label="Stock"
-                  name="stock"
-                  type="number"
-                  placeholder="0"
-                  value={formData.stock}
-                  onChange={handleChange}
-                  error={errors.stock}
-                />
+                <label className="field-label">Producto inventariable</label>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "4px" }}>
+                  <input
+                    type="checkbox"
+                    id="inventariable"
+                    checked={formData.inventariable}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, inventariable: e.target.checked }))
+                    }
+                    style={{ width: "16px", height: "16px", cursor: "pointer" }}
+                  />
+                  <span style={{ fontSize: "13px", color: "#6b7280" }}>
+                    {formData.inventariable
+                      ? "Lleva control de stock"
+                      : "Servicio sin control de stock (se puede agregar sin límite)"}
+                  </span>
+                </div>
               </div>
+
+              {formData.inventariable && (
+                <div className="form-field">
+                  <Input
+                    label="Stock"
+                    name="stock"
+                    type="number"
+                    placeholder="0"
+                    value={formData.stock}
+                    onChange={handleChange}
+                    error={errors.stock}
+                  />
+                </div>
+              )}
 
               <div className="form-field">
                 <Input
@@ -242,6 +271,23 @@ export const EditProductPage = () => {
                   value={formData.sku}
                   onChange={handleChange}
                 />
+              </div>
+
+              <div className="form-field">
+                <label className="field-label">Categoría (opcional)</label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="field-select"
+                >
+                  <option value="">Sin Categoría</option>
+                  {PRODUCT_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="form-field">

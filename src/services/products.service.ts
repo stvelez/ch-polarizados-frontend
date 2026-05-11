@@ -16,6 +16,7 @@ export interface CreateProductDto {
   stock?: number;
   sku?: string | null;
   isActive?: boolean;
+  inventariable?: boolean;
 }
 
 export interface UpdateProductDto {
@@ -25,6 +26,7 @@ export interface UpdateProductDto {
   stock?: number;
   sku?: string | null;
   isActive?: boolean;
+  inventariable?: boolean;
 }
 
 export const productsService = {

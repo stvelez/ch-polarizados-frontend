@@ -9,3 +9,4 @@ export { SalesPage } from './SalesPage/SalesPage';
 export { UsersPage } from './UsersPage/UsersPage';
 export { AddUserPage } from './AddUserPage/AddUserPage';
 export { EditUserPage } from './EditUserPage/EditUserPage';
+export { ViewSalePage } from './ViewSalePage/ViewSalePage';

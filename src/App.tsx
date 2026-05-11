@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { LoginPage, Dashboard, ProductsPage, AddProductPage, EditProductPage, ViewProductPage, NewSalePage, SalesPage, UsersPage, AddUserPage, EditUserPage } from './pages';
+import { LoginPage, Dashboard, ProductsPage, AddProductPage, EditProductPage, ViewProductPage, NewSalePage, SalesPage, ViewSalePage, UsersPage, AddUserPage, EditUserPage } from './pages';
 import { ProtectedRoute, Layout } from './components';
 import './App.scss';
 
@@ -27,6 +27,7 @@ function App() {
           <Route path="/inventory" element={<div style={{ padding: '40px' }}>Inventario - Próximamente</div>} />
           <Route path="/sales" element={<SalesPage />} />
           <Route path="/sales/new" element={<NewSalePage />} />
+          <Route path="/sales/:id" element={<ViewSalePage />} />
           <Route path="/customers" element={<div style={{ padding: '40px' }}>Clientes - Próximamente</div>} />
           <Route path="/reports" element={<div style={{ padding: '40px' }}>Reportes - Próximamente</div>} />
           <Route path="/settings" element={<div style={{ padding: '40px' }}>Configuración - Próximamente</div>} />
