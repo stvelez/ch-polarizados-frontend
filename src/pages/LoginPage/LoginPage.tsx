@@ -9,24 +9,24 @@ export const LoginPage = () => {
   const [email, setEmail] = useState("admin@chpolarizados.com");
   const [password, setPassword] = useState("123456");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    authService
-      .login({ email, password })
-      .then((response) => {
-        console.log("Login exitoso", response);
-        navigate("/products");
-      })
-      .catch((err: Error) => {
-        console.error("Error en login:", err);
-        setError(err.message || "Error al iniciar sesión. Verifica tus credenciales.");
-      });
-
-    // if (!email || !password) {
+    setIsLoading(true);
+    try {
+      const response = await authService.login({ email, password });
+      console.log("Login exitoso", response);
+      navigate("/products");
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error("Error en login:", err);
+      setError(error.message || "Error al iniciar sesión. Verifica tus credenciales.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -79,8 +79,14 @@ export const LoginPage = () => {
               </a>
             </div>
 
-            <Button type="submit" variant="primary" size="large">
-              Iniciar Sesión
+            <Button type="submit" variant="primary" size="large" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <span className="login-spinner" /> Iniciando sesión...
+                </>
+              ) : (
+                "Iniciar Sesión"
+              )}
             </Button>
           </form>
         </div>
